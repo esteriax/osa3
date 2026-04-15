@@ -27,7 +27,9 @@ let notes = [
 app.use(express.json())
 
 app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
+  const viesti = 
+  'Phonebook has info for ' + notes.length + ' people</p><p>' + new Date() + '</p>'
+  response.send(viesti)
 })
 
 app.get('/api/notes', (request, response) => {
