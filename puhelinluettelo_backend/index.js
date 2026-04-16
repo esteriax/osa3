@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-let notes = [
+let persons = [
   {
       "id": "1",
       "name": "Arto Hellas",
@@ -28,20 +28,20 @@ app.use(express.json())
 
 app.get('/', (request, response) => {
   const viesti = 
-  'Phonebook has info for ' + notes.length + ' people</p><p>' + new Date() + '</p>'
+  'Phonebook has info for ' + persons.length + ' people</p><p>' + new Date() + '</p>'
   response.send(viesti)
 })
 
-app.get('/api/notes', (request, response) => {
-  response.json(notes)
+app.get('/api/persons', (request, response) => {
+  response.json(persons)
 })
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  const note = notes.find((note) => note.id === id)
+  const person = persons.find((person) => person.id === id)
 
-  if (note) {
-    response.json(note)
+  if (person) {
+    response.json(person)
   } else {
     response.status(404).end()
   }
@@ -49,11 +49,11 @@ app.get('/api/notes/:id', (request, response) => {
 
 const generateId = () => {
   const maxId =
-    notes.length > 0 ? Math.max(...notes.map((n) => Number(n.id))) : 0
+    persons.length > 0 ? Math.max(...persons.map((n) => Number(n.id))) : 0
   return String(maxId + 1)
 }
 
-app.post('/api/notes', (request, response) => {
+app.post('/api/persons', (request, response) => {
   const body = request.body
 
   if (!body.content) {
@@ -62,20 +62,20 @@ app.post('/api/notes', (request, response) => {
     })
   }
 
-  const note = {
+  const person = {
     content: body.content,
     important: body.important || false,
     id: generateId(),
   }
 
-  notes = notes.concat(note)
+  persons = persons.concat(person)
 
-  response.json(note)
+  response.json(person)
 })
 
-app.delete('/api/notes/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  notes = notes.filter((note) => note.id !== id)
+  persons = persons.filter((person) => person.id !== id)
 
   response.status(204).end()
 })
