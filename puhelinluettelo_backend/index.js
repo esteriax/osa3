@@ -30,10 +30,12 @@ app.get('/', (request, response) => {
   const viesti = 
   'Phonebook has info for ' + persons.length + ' people</p><p>' + new Date() + '</p>'
   response.send(viesti)
+  console.log('Info haettu')
 })
 
 app.get('/api/persons', (request, response) => {
   response.json(persons)
+  console.log('Kaikki henkilöt haettu')
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -45,32 +47,35 @@ app.get('/api/persons/:id', (request, response) => {
   } else {
     response.status(404).end()
   }
+  console.log(person.name + ' haettu')
 })
 
+/*
 const generateId = () => {
-  const maxId =
-    persons.length > 0 ? Math.max(...persons.map((n) => Number(n.id))) : 0
-  return String(maxId + 1)
+  const id = Math.random(1000) 
+  return String(id)
 }
+  */
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
-  if (!body.content) {
+  if (!body.name) {
     return response.status(400).json({
-      error: 'content missing',
+      error: 'name missing',
     })
   }
 
   const person = {
-    content: body.content,
-    important: body.important || false,
-    id: generateId(),
+    name: body.name,
+    number: body.number,
+    id: Math.floor(Math.random() * 1000)
   }
 
   persons = persons.concat(person)
 
   response.json(person)
+  console.log(person.name + ' lisätty')
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -78,6 +83,7 @@ app.delete('/api/persons/:id', (request, response) => {
   persons = persons.filter((person) => person.id !== id)
 
   response.status(204).end()
+  console.log(person.name + ' poistettu')
 })
 
 const PORT = 3001
