@@ -1,5 +1,7 @@
 const express = require('express')
 const app = express()
+var morgan = require('morgan')
+
 
 let persons = [
   {
@@ -25,6 +27,7 @@ let persons = [
 ]
 
 app.use(express.json())
+app.use(morgan('tiny'))
 
 app.get('/', (request, response) => {
   console.log('Yritetään hakea etusivua')
@@ -91,12 +94,13 @@ app.post('/api/persons', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  console.log('Yritetään poistaa henkilö' + request.params.name)
   const id = request.params.id
+  const personToBeDeleted = persons.find((person) => person.id === id)
+  console.log('Yritetään poistaa henkilö ' + personToBeDeleted.name)
   persons = persons.filter((person) => person.id !== id)
 
   response.status(204).end()
-  console.log(person.name + ' poistettu')
+  console.log(personToBeDeleted.name + ' poistettu')
 })
 
 const PORT = 3001
