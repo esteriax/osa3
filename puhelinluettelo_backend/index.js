@@ -1,13 +1,13 @@
 const express = require('express')
 const app = express()
 var morgan = require('morgan')
-const cors = require('cors')
+//const cors = require('cors')
 
 
 app.use(express.json())
 morgan.token('body', (req) => { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
-app.use(cors())
+//app.use(cors())
 app.use(express.static('dist'))
 
 let persons = [
@@ -99,6 +99,7 @@ app.post('/api/persons', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
   const id = request.params.id
+  //console.log(typeof request.params.id, typeof persons[0].id)
   const personToBeDeleted = persons.find((person) => person.id === id)
   console.log('Yritetään poistaa henkilö ' + personToBeDeleted.name)
   persons = persons.filter((person) => person.id !== id)
