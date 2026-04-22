@@ -3,45 +3,36 @@ const express = require('express')
 const Person = require('./models/person')
 
 const app = express()
+
 var morgan = require('morgan')
-//const cors = require('cors')
-//const mongoose = require('mongoose')
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
 
-/*
-const password = process.argv[2]
-const nameArg = process.argv[3]
-const numberArg = process.argv[4]
-
-const url = `mongodb+srv://fullstack:${password}@cluster0.pjl2q7c.mongodb.net/phoneBook?retryWrites=true&w=majority&appName=Cluster0`
-
-mongoose.set('strictQuery', false)
-mongoose.connect(url, { family: 4 })
-
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-})
-
-personSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
   }
-})
 
-const Person = mongoose.model('Person', personSchema)
-*/
+  next(error)
+}
 
+const requestLogger = (request, response, next) => {
+  console.log('Method:', request.method)
+  console.log('Path:  ', request.path)
+  console.log('Body:  ', request.body)
+  console.log('---')
+  next()
+}
+
+app.use(express.static('dist'))
 app.use(express.json())
+app.use(requestLogger)
+
 morgan.token('body', (req) => { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
-//app.use(cors())
-app.use(express.static('dist'))
 
-let persons = [
-]
+
+let persons = [ ]
 
 app.get('/', (request, response) => {
   console.log('Yritetään hakea etusivua')
@@ -59,7 +50,7 @@ app.get('/api/persons', (request, response) => {
   console.log('Kaikki henkilöt haettu')
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   console.log('Yritetään hakea henkilöä')
   const id = request.params.id
   Person.findById(id).then(person => {
@@ -69,17 +60,19 @@ app.get('/api/persons/:id', (request, response) => {
       response.status(404).end()
     }
   })
+  .catch(error => {
+      next(error)
+      console.log(error)
+      response.status(500).end()
+    })
   console.log('Henkilö haettu')
   })
   
-
-
 /*
 const generateId = () => {
   const id = Math.random(1000) 
   return String(id)
-}
-  */
+}*/
 
 app.post('/api/persons', (request, response) => {
   console.log('Yritetään lisätä henkilö')
@@ -112,16 +105,25 @@ app.post('/api/persons', (request, response) => {
 
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = request.params.id
-  //console.log(typeof request.params.id, typeof persons[0].id)
-  const personToBeDeleted = persons.find((person) => person.id === id)
-  console.log('Yritetään poistaa henkilö ' + personToBeDeleted.name)
-  persons = persons.filter((person) => person.id !== id)
-
-  response.status(204).end()
-  console.log(personToBeDeleted.name + ' poistettu')
+app.delete('/api/persons/:id', (request, response, next) => {
+  console.log('Yritetään poistaa henkilö')
+  Person.findByIdAndDelete(request.params.id)
+  .then((result) => {
+    response.status(204).end()
+  })
+  .catch((error) => {
+    next(error)
+    console.log(error)
+  })
+  console.log('Henkilö poistettu')
 })
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(errorHandler)
+app.use(unknownEndpoint)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
