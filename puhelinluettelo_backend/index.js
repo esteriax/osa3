@@ -12,7 +12,6 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   }
-
   next(error)
 }
 
@@ -31,7 +30,6 @@ app.use(requestLogger)
 morgan.token('body', (req) => { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-
 let persons = [ ]
 
 app.get('/', (request, response) => {
@@ -42,11 +40,12 @@ app.get('/', (request, response) => {
   console.log('Etusivu haettu')
 })
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
   console.log('Yritetään hakea henkilöitä')
   Person.find ({}).then(persons => {
     response.json(persons)
   })
+  .catch((error) => next(error))
   console.log('Kaikki henkilöt haettu')
 })
 
@@ -60,11 +59,7 @@ app.get('/api/persons/:id', (request, response, next) => {
       response.status(404).end()
     }
   })
-  .catch(error => {
-      next(error)
-      console.log(error)
-      response.status(500).end()
-    })
+  .catch((error) => next(error))
   console.log('Henkilö haettu')
   })
   
@@ -74,7 +69,7 @@ const generateId = () => {
   return String(id)
 }*/
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   console.log('Yritetään lisätä henkilö')
   const body = request.body
 
@@ -102,7 +97,7 @@ app.post('/api/persons', (request, response) => {
     response.json(savedPerson)
     console.log(person.name + ' lisätty')
   })
-
+  .catch((error) => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -111,10 +106,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
   .then((result) => {
     response.status(204).end()
   })
-  .catch((error) => {
-    next(error)
-    console.log(error)
-  })
+  .catch((error) => next(error))
   console.log('Henkilö poistettu')
 })
 
@@ -129,4 +121,3 @@ const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
-
