@@ -32,12 +32,14 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 let persons = [ ]
 
-app.get('/', (request, response) => {
-  console.log('Yritetään hakea etusivua')
-  const viesti = 
-  'Phonebook has info for ' + persons.length + ' people</p><p>' + new Date() + '</p>'
-  response.send(viesti)
-  console.log('Etusivu haettu')
+app.get('/info', (request, response) => {
+  console.log('Yritetään hakea info-sivua')
+    Person.countDocuments({}).then(count => {
+      const viesti = 
+      'Phonebook has info for ' + count + ' people</p><p>' + new Date() + '</p>'
+      response.send(viesti)
+      console.log('Info-sivu haettu')
+    })
 })
 
 app.get('/api/persons', (request, response, next) => {
