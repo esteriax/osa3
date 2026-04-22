@@ -1,8 +1,38 @@
+require('dotenv').config()
 const express = require('express')
+const Person = require('./models/person')
+
 const app = express()
 var morgan = require('morgan')
 //const cors = require('cors')
+//const mongoose = require('mongoose')
 
+
+/*
+const password = process.argv[2]
+const nameArg = process.argv[3]
+const numberArg = process.argv[4]
+
+const url = `mongodb+srv://fullstack:${password}@cluster0.pjl2q7c.mongodb.net/phoneBook?retryWrites=true&w=majority&appName=Cluster0`
+
+mongoose.set('strictQuery', false)
+mongoose.connect(url, { family: 4 })
+
+const personSchema = new mongoose.Schema({
+  name: String,
+  number: String,
+})
+
+personSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
+const Person = mongoose.model('Person', personSchema)
+*/
 
 app.use(express.json())
 morgan.token('body', (req) => { return JSON.stringify(req.body) })
@@ -11,26 +41,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 app.use(express.static('dist'))
 
 let persons = [
-  {
-      "id": "1",
-      "name": "Arto Hellas",
-      "number": "040-123456"
-    },
-    {
-      "id": "2",
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523",
-    },
-    {
-      "id": "3",
-      "name": "Dan Abramov",
-      "number": "12-43-234345",
-    },
-    {
-      "id": "4",
-      "name": "Mary Poppendieck",
-      "number": "39-23-6423122",
-    }
 ]
 
 app.get('/', (request, response) => {
@@ -43,22 +53,26 @@ app.get('/', (request, response) => {
 
 app.get('/api/persons', (request, response) => {
   console.log('Yritetään hakea henkilöitä')
-  response.json(persons)
+  Person.find ({}).then(persons => {
+    response.json(persons)
+  })
   console.log('Kaikki henkilöt haettu')
 })
 
 app.get('/api/persons/:id', (request, response) => {
   console.log('Yritetään hakea henkilöä')
   const id = request.params.id
-  const person = persons.find((person) => person.id === id)
+  Person.findById(id).then(person => {
+    if (person) {
+      response.json(person)
+    } else {
+      response.status(404).end()
+    }
+  })
+  console.log('Henkilö haettu')
+  })
+  
 
-  if (person) {
-    response.json(person)
-  } else {
-    response.status(404).end()
-  }
-  console.log(person.name + ' haettu')
-})
 
 /*
 const generateId = () => {
@@ -85,16 +99,17 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
     id: Math.floor(Math.random() * 1000)
-  }
+  })
 
-  persons = persons.concat(person)
+  person.save().then(savedPerson => { 
+    response.json(savedPerson)
+    console.log(person.name + ' lisätty')
+  })
 
-  response.json(person)
-  console.log(person.name + ' lisätty')
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -108,9 +123,8 @@ app.delete('/api/persons/:id', (request, response) => {
   console.log(personToBeDeleted.name + ' poistettu')
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
-
 
