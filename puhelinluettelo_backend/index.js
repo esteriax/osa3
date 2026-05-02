@@ -12,6 +12,9 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   }
+  else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
   next(error)
 }
 
@@ -79,6 +82,13 @@ app.post('/api/persons', (request, response, next) => {
     console.log('Nimi tai numero puuttuu')
     return response.status(400).json({
       error: 'name or number missing',
+    })
+  }
+
+  if (body.name.length < 3) {
+    console.log('Nimi on liian lyhyt')
+    return response.status(400).json({
+      error: ' is under 3 characters',
     })
   }
 
