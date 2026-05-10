@@ -26,7 +26,7 @@ mongoose.connect(url, { family: 4 })
     .catch((error) => {
         console.log('error connecting to MongoDB:', error.message)
     })
-
+/*
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -35,16 +35,17 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
-    required: true
+    required: true,
+    minlength: 8,
   },
-})
+}) 
 
 const Person = mongoose.model('Person', personSchema)
 
 const person = new Person({
   name: nameArg,
   number: numberArg
-})
+}) */
 
 if (process.argv.length === 3) {
   console.log('puhelinluettelo:')   

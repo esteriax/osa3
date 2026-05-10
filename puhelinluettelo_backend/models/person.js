@@ -23,7 +23,14 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
-    requried: true
+    required: true,
+    minlength: 8,
+    validate: {
+      validator: (v) => {
+        return /^\d{2,3}-\d+$/.test(v)
+      },
+      message: props => `${props.value} ei ole kelvollinen puhelinnumero`
+    },
   }
 })
 
