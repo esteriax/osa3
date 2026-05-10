@@ -20,13 +20,13 @@ const numberArg = process.argv[4]
 
 mongoose.set('strictQuery', false)
 mongoose.connect(url, { family: 4 })
-    .then(result => {
-        console.log('connected to MongoDB')
-    })
-    .catch((error) => {
-        console.log('error connecting to MongoDB:', error.message)
-    })
-/*
+  .then(() => {
+    console.log('connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connecting to MongoDB:', error.message)
+  })
+
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -38,30 +38,30 @@ const personSchema = new mongoose.Schema({
     required: true,
     minlength: 8,
   },
-}) 
+})
 
 const Person = mongoose.model('Person', personSchema)
 
 const person = new Person({
   name: nameArg,
   number: numberArg
-}) */
+})
 
 if (process.argv.length === 3) {
-  console.log('puhelinluettelo:')   
+  console.log('puhelinluettelo:')
   Person.find({}).then(result => {
     result.forEach(person => {
-        console.log(person.name + ' ' + person.number)
+      console.log(person.name + ' ' + person.number)
     })
     mongoose.connection.close()
-    }) 
+  })
 }
 
 else if (process.argv.length === 5) {
-person.save().then(result => {
-  console.log(nameArg + ' ' + numberArg + ' added to phonebook')
-  mongoose.connection.close()
-}) 
+  person.save().then(() => {
+    console.log(nameArg + ' ' + numberArg + ' added to phonebook')
+    mongoose.connection.close()
+  })
 }
 
 module.exports = mongoose.model('Person', personSchema)

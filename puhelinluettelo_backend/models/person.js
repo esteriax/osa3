@@ -3,12 +3,12 @@ const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
 
 const url = process.env.MONGODB_URI
-MONGODB_URI="osoite_tahan"
+//MONGODB_URI='osoite_tahan'
 //const password = process.argv[2]
 
 console.log('connecting to', url)
 mongoose.connect(url, { family: 4 })
-  .then(result => {
+  .then(() => {
     console.log('connected to MongoDB')
   })
   .catch((error) => {

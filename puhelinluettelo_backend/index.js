@@ -37,12 +37,12 @@ let persons = [ ]
 
 app.get('/info', (request, response) => {
   console.log('Yritetään hakea info-sivua')
-    Person.countDocuments({}).then(count => {
-      const viesti = 
+  Person.countDocuments({}).then(count => {
+    const viesti =
       'Phonebook has info for ' + count + ' people</p><p>' + new Date() + '</p>'
-      response.send(viesti)
-      console.log('Info-sivu haettu')
-    })
+    response.send(viesti)
+    console.log('Info-sivu haettu')
+  })
 })
 
 app.get('/api/persons', (request, response, next) => {
@@ -50,7 +50,7 @@ app.get('/api/persons', (request, response, next) => {
   Person.find ({}).then(persons => {
     response.json(persons)
   })
-  .catch((error) => next(error))
+    .catch((error) => next(error))
   console.log('Kaikki henkilöt haettu')
 })
 
@@ -64,13 +64,13 @@ app.get('/api/persons/:id', (request, response, next) => {
       response.status(404).end()
     }
   })
-  .catch((error) => next(error))
+    .catch((error) => next(error))
   console.log('Henkilö haettu')
-  })
-  
+})
+
 /*
 const generateId = () => {
-  const id = Math.random(1000) 
+  const id = Math.random(1000)
   return String(id)
 }*/
 
@@ -105,20 +105,20 @@ app.post('/api/persons', (request, response, next) => {
     id: Math.floor(Math.random() * 1000)
   })
 
-  person.save().then(savedPerson => { 
+  person.save().then(savedPerson => {
     response.json(savedPerson)
     console.log(person.name + ' lisätty')
   })
-  .catch((error) => next(error))
+    .catch((error) => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
   console.log('Yritetään poistaa henkilö')
   Person.findByIdAndDelete(request.params.id)
-  .then((result) => {
-    response.status(204).end()
-  })
-  .catch((error) => next(error))
+    .then(() => {
+      response.status(204).end()
+    })
+    .catch((error) => next(error))
   console.log('Henkilö poistettu')
 })
 
